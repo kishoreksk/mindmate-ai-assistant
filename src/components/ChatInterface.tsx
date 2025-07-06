@@ -1,8 +1,12 @@
 
 import { useState, useEffect, useRef } from "react";
-import { Heart, Bot, User } from "lucide-react";
+import { Heart, X } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
+import ChatSuggestions from "./ChatSuggestions";
+import AppointmentForm from "./AppointmentForm";
+import PatientHealthQuestionnaire from "./PatientHealthQuestionnaire";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface Message {
   id: string;
@@ -21,6 +25,8 @@ const ChatInterface = () => {
     },
   ]);
   const [isTyping, setIsTyping] = useState(false);
+  const [showAppointmentForm, setShowAppointmentForm] = useState(false);
+  const [showHealthQuestionnaire, setShowHealthQuestionnaire] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -37,6 +43,11 @@ const ChatInterface = () => {
     // Check for crisis-related keywords
     if (lowerMessage.includes('suicide') || lowerMessage.includes('hurt myself') || lowerMessage.includes('end it all')) {
       return "I'm very concerned about what you've shared. Your safety is the top priority. Please reach out to a crisis helpline immediately: National Suicide Prevention Lifeline at 988 or contact emergency services at 911. You can also reach out to Soulklinic's emergency support. You don't have to go through this alone.";
+    }
+    
+    // Check for services inquiry
+    if (lowerMessage.includes('services') || lowerMessage.includes('what do you offer')) {
+      return "Soulklinic offers comprehensive mental health services including: Individual Therapy, Group Therapy, Psychiatric Consultations, Crisis Intervention, Telepsychiatry Sessions, Cognitive Behavioral Therapy (CBT), Depression & Anxiety Treatment, Trauma-Informed Care, and 24/7 AI Support through MindMate. We also provide specialized programs for PTSD, addiction recovery, and family counseling. Would you like to schedule an appointment or learn more about any specific service?";
     }
     
     // Check for anxiety-related content
@@ -92,6 +103,44 @@ const ChatInterface = () => {
     }, 800 + Math.random() * 1200);
   };
 
+  const handleSuggestionClick = (action: string) => {
+    switch (action) {
+      case 'schedule-appointment':
+        setShowAppointmentForm(true);
+        break;
+      case 'services':
+        handleSendMessage("What services do you offer?");
+        break;
+      case 'mental-health-resources':
+        setShowHealthQuestionnaire(true);
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleAppointmentSubmit = (data: any) => {
+    console.log('Appointment data:', data);
+    const confirmationMessage: Message = {
+      id: Date.now().toString(),
+      text: `Thank you ${data.firstName}! Your appointment request for ${data.appointmentDate} at ${data.appointmentTime} has been received. Our team will contact you within 24 hours to confirm your appointment. If you need immediate assistance, please call our emergency line.`,
+      isUser: false,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, confirmationMessage]);
+  };
+
+  const handleQuestionnaireSubmit = (data: any) => {
+    console.log('Questionnaire data:', data);
+    const confirmationMessage: Message = {
+      id: Date.now().toString(),
+      text: `Thank you for completing your health questionnaire, ${data.firstName}. This information will help our clinical team provide you with the most appropriate care. Based on your responses, we recommend scheduling a consultation with one of our mental health professionals. Would you like me to help you schedule an appointment?`,
+      isUser: false,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, confirmationMessage]);
+  };
+
   return (
     <div className="flex flex-col h-screen max-w-4xl mx-auto">
       {/* Header */}
@@ -133,10 +182,31 @@ const ChatInterface = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
+      {/* Input with Suggestions */}
       <div className="p-4 bg-white/70 backdrop-blur-sm border-t border-teal-200/50">
+        <ChatSuggestions onSuggestionClick={handleSuggestionClick} />
         <ChatInput onSendMessage={handleSendMessage} />
       </div>
+
+      {/* Appointment Form Dialog */}
+      <Dialog open={showAppointmentForm} onOpenChange={setShowAppointmentForm}>
+        <DialogContent className="max-w-md">
+          <AppointmentForm
+            onClose={() => setShowAppointmentForm(false)}
+            onSubmit={handleAppointmentSubmit}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Health Questionnaire Dialog */}
+      <Dialog open={showHealthQuestionnaire} onOpenChange={setShowHealthQuestionnaire}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <PatientHealthQuestionnaire
+            onClose={() => setShowHealthQuestionnaire(false)}
+            onSubmit={handleQuestionnaireSubmit}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
