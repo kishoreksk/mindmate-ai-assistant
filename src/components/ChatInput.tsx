@@ -33,15 +33,15 @@ const ChatInput = ({ onSendMessage }: ChatInputProps) => {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Type your message..."
-          className="resize-none border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl bg-white/80 backdrop-blur-sm"
+          placeholder="Share what's on your mind..."
+          className="resize-none border-teal-200 focus:border-teal-500 focus:ring-teal-500 rounded-xl bg-white/90 backdrop-blur-sm"
           autoFocus
         />
       </div>
       <Button
         type="submit"
         disabled={!input.trim()}
-        className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white rounded-xl px-4 py-2 shadow-sm transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white rounded-xl px-4 py-2 shadow-sm transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Send className="w-4 h-4" />
       </Button>
