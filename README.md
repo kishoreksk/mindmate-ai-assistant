@@ -1,4 +1,4 @@
-# AI Healthcare chatbot for Psychiatry
+# Mindmate - AI Healthcare chatbot for Psychiatry
 
 
 **Use your preferred IDE**
